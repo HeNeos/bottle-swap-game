@@ -19,44 +19,71 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4 # Updated to v4
+
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # Updated to v4
         with:
           node-version: "18"
-          cache: 'npm'
-      
+          cache: 'npm' # Changed from 'npm' to 'pnpm' if you use pnpm
+
+      # Consider caching Rust dependencies if build times are long
+      # - name: Cache Cargo registry
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cargo/registry
+      #     key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+      # - name: Cache Cargo index
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.cargo/git
+      #     key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+      # - name: Cache Cargo build cache
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: rust/target
+      #     key: ${{ runner.os }}-cargo-build-target-${{ hashFiles('**/Cargo.lock') }}
+
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           target: wasm32-unknown-unknown
-          profile: minimal
+          profile: minimal # Use 'minimal' for faster setup if sufficient
           override: true
-      
+
       - name: Install wasm-pack
+        # Consider caching wasm-pack binary if needed
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-      
+
       - name: Build Rust WASM
         run: |
           cd rust
-          wasm-pack build --target web
-      
+          # Build in release mode for production deployment
+          wasm-pack build --target web --release --out-dir pkg
+        working-directory: ./ # Ensure wasm-pack runs relative to project root if needed, or keep cd rust
+
       - name: Install dependencies
-        run: npm ci
-      
-      - name: Build
-        run: npm run build
+        # Use pnpm install if you use pnpm, otherwise npm ci
+        run: npm ci --force # or pnpm install --frozen-lockfile
+
+      - name: Build Next.js App
+        # Ensure NEXT_PUBLIC_BASE_PATH is correctly set for GitHub Pages subdirectory repo
+        # Example: If repo is USERNAME.github.io/bottle-swap-game, base path is /bottle-swap-game
+        run: npm run build # or pnpm build
         env:
+          # Make sure this matches your repository name if deploying to USERNAME.github.io/REPO_NAME
           NEXT_PUBLIC_BASE_PATH: /bottle-swap-game
-      
+
       - name: Setup Pages
-        uses: actions/configure-pages@v3
-      
+        # configure-pages@v5 is the latest as of now
+        uses: actions/configure-pages@v5
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        # upload-pages-artifact@v3 is the latest as of now
+        uses: actions/upload-pages-artifact@v3
         with:
+          # Path to the static export output directory (usually 'out' for Next.js static export)
           path: ./out
 
   deploy:
@@ -68,4 +95,6 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        # deploy-pages@v4 is the latest as of now
+        uses: actions/deploy-pages@v4
+
