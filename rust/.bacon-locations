@@ -1,0 +1,56 @@
+warning|:|src/lib.rs|:|142|:|142|:|17|:|37|:|value assigned to `current_liquid_level` is never read|:|[0m[1m[33mwarning[0m[0m[1m: value assigned to `current_liquid_level` is never read[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:142:17[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m142[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let mut current_liquid_level = 0;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                 [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: maybe it is overwritten before being read?[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_assignments)]` on by default[0m
+
+|:|none
+warning|:|src/lib.rs|:|95|:|96|:|5|:|86|:|question mark operator is useless here|:|[0m[1m[33mwarning[0m[0m[1m: question mark operator is useless here[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:95:5[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m95[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m/[0m[0m [0m[0m    Ok(serde_wasm_bindgen::to_value(&movements)[0m
+[0m[1m[38;5;12m96[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m|[0m[0m [0m[0m        .map_err(|e| JsError::new(&format!("Failed to serialize solution: {}", e)))?)[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m|_____________________________________________________________________________________^[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_question_mark[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(clippy::needless_question_mark)]` on by default[0m
+[0m[1m[38;5;14mhelp[0m[0m: try removing question mark and `Ok()`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m95[0m[0m [0m[0m[38;5;10m~ [0m[0m    [0m[0m[38;5;10mserde_wasm_bindgen::to_value(&movements)[0m
+[0m[1m[38;5;12m96[0m[0m [0m[0m[38;5;10m+         .map_err(|e| JsError::new(&format!("Failed to serialize solution: {}", e)))[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+
+|:|none
+help|:|src/lib.rs|:|95|:|96|:|5|:|86|:|try removing question mark and `Ok()`|:|none|:|serde_wasm_bindgen::to_value(&movements)
+        .map_err(|e| JsError::new(&format!("Failed to serialize solution: {}", e)))
+warning|:|src/lib.rs|:|142|:|142|:|17|:|37|:|value assigned to `current_liquid_level` is never read|:|[0m[1m[33mwarning[0m[0m[1m: value assigned to `current_liquid_level` is never read[0m
+[0m   [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:142:17[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m142[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m        let mut current_liquid_level = 0;[0m
+[0m    [0m[0m[1m[38;5;12m|[0m[0m                 [0m[0m[1m[33m^^^^^^^^^^^^^^^^^^^^[0m
+[0m    [0m[0m[1m[38;5;12m|[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: maybe it is overwritten before being read?[0m
+[0m    [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(unused_assignments)]` on by default[0m
+
+|:|none
+warning|:|src/lib.rs|:|95|:|96|:|5|:|86|:|question mark operator is useless here|:|[0m[1m[33mwarning[0m[0m[1m: question mark operator is useless here[0m
+[0m  [0m[0m[1m[38;5;12m--> [0m[0msrc/lib.rs:95:5[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m95[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m/[0m[0m [0m[0m    Ok(serde_wasm_bindgen::to_value(&movements)[0m
+[0m[1m[38;5;12m96[0m[0m [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m|[0m[0m [0m[0m        .map_err(|e| JsError::new(&format!("Failed to serialize solution: {}", e)))?)[0m
+[0m   [0m[0m[1m[38;5;12m|[0m[0m [0m[0m[1m[33m|_____________________________________________________________________________________^[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mhelp[0m[0m: for further information visit https://rust-lang.github.io/rust-clippy/master/index.html#needless_question_mark[0m
+[0m   [0m[0m[1m[38;5;12m= [0m[0m[1mnote[0m[0m: `#[warn(clippy::needless_question_mark)]` on by default[0m
+[0m[1m[38;5;14mhelp[0m[0m: try removing question mark and `Ok()`[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+[0m[1m[38;5;12m95[0m[0m [0m[0m[38;5;10m~ [0m[0m    [0m[0m[38;5;10mserde_wasm_bindgen::to_value(&movements)[0m
+[0m[1m[38;5;12m96[0m[0m [0m[0m[38;5;10m+         .map_err(|e| JsError::new(&format!("Failed to serialize solution: {}", e)))[0m
+[0m   [0m[0m[1m[38;5;12m|[0m
+
+|:|none
+help|:|src/lib.rs|:|95|:|96|:|5|:|86|:|try removing question mark and `Ok()`|:|none|:|serde_wasm_bindgen::to_value(&movements)
+        .map_err(|e| JsError::new(&format!("Failed to serialize solution: {}", e)))
