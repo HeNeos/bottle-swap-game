@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
+use std::cmp::{max, min};
 use std::collections::{HashSet, VecDeque};
-use std::hash::{Hash, Hasher}; // Needed for manual impl
+use std::hash::{Hash, Hasher};
 use wasm_bindgen::prelude::*;
 
-// Maximum dimensions for internal arrays
 const MAX_LEVELS: usize = 12;
 const MAX_N_OF_BOTTLES: usize = 10;
 
@@ -26,40 +26,29 @@ struct Movement {
     amount: usize,
 }
 
-// Internal state representation for BFS
-// Need manual Hash and Eq to only consider relevant bottles
 #[derive(Clone, Debug)]
 struct State {
     state: [Bottle; MAX_N_OF_BOTTLES],
     previous_state: Option<Box<State>>,
     last_movement: Option<(usize, usize)>,
     how_much_moved: usize,
-    // Store the actual dimensions used by this state instance
     levels: usize,
     n_of_bottles: usize,
 }
 
-// Manual Hash implementation
 impl Hash for State {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        // Only hash the relevant part of the state array
         self.state[0..self.n_of_bottles].hash(state);
-        // We don't hash previous_state, last_movement, how_much_moved, levels, n_of_bottles
-        // as they don't define the board state itself for the visited set.
     }
 }
 
-// Manual PartialEq implementation
 impl PartialEq for State {
     fn eq(&self, other: &Self) -> bool {
-        // Only compare the relevant part of the state array
-        self.n_of_bottles == other.n_of_bottles // Must have same dimensions active
+        self.n_of_bottles == other.n_of_bottles
             && self.state[0..self.n_of_bottles] == other.state[0..other.n_of_bottles]
-        // Don't compare previous_state etc. for board equality
     }
 }
 
-// Eq requires PartialEq
 impl Eq for State {}
 
 #[wasm_bindgen]
@@ -68,7 +57,6 @@ pub fn solve(
     n_of_bottles: usize,
     game_state_js: JsValue,
 ) -> Result<JsValue, JsError> {
-    // --- Initial checks ---
     if levels == 0 || levels > MAX_LEVELS {
         return Err(JsError::new(&format!(
             "Invalid levels: {}. Must be > 0 and <= {}.",
@@ -87,8 +75,8 @@ pub fn solve(
 
     let initial_state = convert_to_internal_state(&game_state, levels, n_of_bottles)?;
 
-    let solution = bfs_liquid_pouring(initial_state) // Pass state which now contains dimensions
-        .ok_or_else(|| JsError::new("No solution found"))?;
+    let solution =
+        bfs_liquid_pouring(initial_state).ok_or_else(|| JsError::new("No solution found"))?;
 
     let movements = extract_movements(solution);
 
@@ -118,21 +106,18 @@ fn convert_to_internal_state(
     for (i, js_bottle_vec) in game_state_from_js.bottles.iter().enumerate() {
         if i >= n_of_bottles {
             break;
-        } // Should not happen due to check above, but safe
+        }
 
         // Check if JS bottle length matches expected levels
         // Allow flexibility? Or enforce strict match? Let's enforce for now.
         let js_vec_len = js_bottle_vec.len();
         if js_vec_len != levels {
-            // If JS sends arrays shorter than 'levels', how to interpret? Assume padded with 0 at top?
-            // If JS sends arrays longer than 'levels', it's an error.
             if js_vec_len > levels {
                 return Err(JsError::new(&format!(
                     "Bottle {} from JS has length {}, exceeds game levels {}",
                     i, js_vec_len, levels
                 )));
             }
-            // If shorter, we might proceed assuming top is empty, but strict is safer.
             return Err(JsError::new(&format!(
                 "Bottle {} from JS has length {}, expected game levels {}",
                 i, js_vec_len, levels
@@ -142,17 +127,13 @@ fn convert_to_internal_state(
         let mut current_liquid_level = 0;
         let mut temp_bottle_state = [0u8; MAX_LEVELS];
 
-        // JS: [TopLiquid, ..., BottomLiquid, 0...]
-        // Internal: [BottomLiquid, ..., TopLiquid, 0...]
         let mut internal_idx = 0;
         for &color in js_bottle_vec.iter().rev() {
-            // Iterate JS from bottom to top
             if color != 0 {
                 if internal_idx < levels {
                     temp_bottle_state[internal_idx] = color;
                     internal_idx += 1;
                 } else {
-                    // This indicates more non-zero elements than 'levels' allows
                     return Err(JsError::new(&format!(
                         "Too much liquid in JS bottle {} for specified levels {}",
                         i, levels
@@ -178,12 +159,37 @@ fn convert_to_internal_state(
         previous_state: None,
         last_movement: None,
         how_much_moved: 0,
-        levels, // Store dimensions in the state
+        levels,
         n_of_bottles,
     })
 }
 
-// --- Functions now take &State to access dimensions ---
+fn measure_bottle_entropy(bottle: &Bottle) -> i64 {
+    if bottle.liquid_level == 0 {
+        return 0;
+    }
+    let mut entropy: i64 = 1;
+    let mut previous_liquid = bottle.state[0];
+    for k in (1..bottle.liquid_level) {
+        let current_liquid = bottle.state[k];
+        if current_liquid == 0 {
+            break;
+        }
+        if current_liquid != previous_liquid {
+            entropy *= 2;
+        }
+        previous_liquid = current_liquid;
+    }
+    entropy
+}
+
+fn measure_state_entropy(state: &State) -> i64 {
+    let mut entropy: i64 = 0;
+    for k in (0..state.n_of_bottles) {
+        entropy += measure_bottle_entropy(&state.state[k]);
+    }
+    entropy
+}
 
 fn is_valid_to_move(from_bottle: &Bottle, to_bottle: &Bottle, levels: usize) -> bool {
     if from_bottle.liquid_level == 0 || to_bottle.liquid_level >= levels {
@@ -208,12 +214,10 @@ fn how_much_to_move(from_bottle: &Bottle, to_bottle: &Bottle, levels: usize) -> 
     pourable_amount.min(levels - to_bottle.liquid_level)
 }
 
-// Relaxed final state check (matches C++ version)
 fn is_final_state_bottle(bottle: &Bottle) -> bool {
     if bottle.liquid_level == 0 {
         return true;
     }
-    // Check if all existing liquids match the bottom-most liquid
     let bottom_color = bottle.state[0];
     (1..bottle.liquid_level).all(|k| bottle.state[k] == bottom_color)
 }
@@ -228,7 +232,6 @@ fn move_liquid(from_bottle: &mut Bottle, to_bottle: &mut Bottle, amount: usize) 
     }
     let liquid_to_move = from_bottle.top_liquid;
 
-    // Remove from source
     for k in 0..amount {
         from_bottle.state[(from_bottle.liquid_level - 1) - k] = 0;
     }
@@ -239,21 +242,19 @@ fn move_liquid(from_bottle: &mut Bottle, to_bottle: &mut Bottle, amount: usize) 
         0
     };
 
-    // Add to destination
     for k in 0..amount {
-        // Check against MAX_LEVELS for safety, though amount should be constrained by dynamic levels
         if to_bottle.liquid_level + k < MAX_LEVELS {
             to_bottle.state[to_bottle.liquid_level + k] = liquid_to_move;
         } else {
             break;
-        } // Safety break
+        }
     }
     to_bottle.liquid_level += amount;
     to_bottle.top_liquid = liquid_to_move;
 }
 
 fn move_liquid_state(current_state: &State, from: usize, to: usize, amount: usize) -> State {
-    let mut new_state = current_state.clone(); // Clones dimensions as well
+    let mut new_state = current_state.clone();
 
     if from < to {
         let (slice_before_to, slice_from_to) = new_state.state.split_at_mut(to);
@@ -269,16 +270,16 @@ fn move_liquid_state(current_state: &State, from: usize, to: usize, amount: usiz
     new_state
 }
 
-// BFS now uses dimensions stored within the State
 fn bfs_liquid_pouring(initial_state: State) -> Option<State> {
     let mut queue = VecDeque::new();
-    let mut visited: HashSet<State> = HashSet::new(); // Uses manual Hash/Eq
+    let mut visited: HashSet<State> = HashSet::new();
 
     visited.insert(initial_state.clone());
     queue.push_back(initial_state);
 
+    let mut min_visible_entropy = (1u64 << 32);
+
     while let Some(current) = queue.pop_front() {
-        // Use dimensions from the current state
         let levels = current.levels;
         let n_of_bottles = current.n_of_bottles;
 
@@ -286,6 +287,15 @@ fn bfs_liquid_pouring(initial_state: State) -> Option<State> {
             return Some(current);
         }
 
+        let initial_entropy: i64 = measure_state_entropy(&current);
+        if initial_entropy as f64 > 1.44 * min_visible_entropy as f64 {
+            continue;
+        }
+
+        let mut future_states: Vec<State> = Vec::new();
+        let mut future_states_entropies: Vec<(i64, i64)> = Vec::new();
+
+        let mut position: i64 = 0;
         for i in 0..n_of_bottles {
             for j in 0..n_of_bottles {
                 if i == j {
@@ -295,14 +305,29 @@ fn bfs_liquid_pouring(initial_state: State) -> Option<State> {
                 let amount = how_much_to_move(&current.state[i], &current.state[j], levels);
 
                 if amount > 0 {
-                    // move_liquid_state clones dimensions from current
                     let next_state = move_liquid_state(&current, i, j, amount);
-                    // visited check uses manual Hash/Eq on relevant bottles
                     if visited.insert(next_state.clone()) {
-                        queue.push_back(next_state);
+                        future_states.push(next_state.clone());
+                        future_states_entropies
+                            .push((measure_state_entropy(&next_state), position));
+                        position += 1;
                     }
                 }
             }
+        }
+        future_states_entropies.sort();
+        let prunning_factor: i64 = 2;
+        let min_branches: i64 = 5;
+        let future_branch_size = min(position, max(position / prunning_factor, min_branches));
+        if position != 0 {
+            min_visible_entropy = min(min_visible_entropy, future_states_entropies[0].0 as u64);
+        }
+        for i in (0..future_branch_size) {
+            if future_states_entropies[i as usize].0 as f64 > 1.2 * initial_entropy as f64 {
+                break;
+            }
+            let future_position = future_states_entropies[i as usize].1 as usize;
+            queue.push_back(future_states[future_position].clone());
         }
     }
     None
