@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
+import { Progress } from "@/components/ui/progress" 
 import { RefreshCw, Play, RotateCcw, Zap, Check } from "lucide-react"
 import { motion } from "framer-motion"
 
@@ -34,7 +34,7 @@ export function GameControls({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.3 }}
       className="space-y-6"
     >
       <div className="flex flex-wrap gap-3 justify-center">
@@ -50,8 +50,8 @@ export function GameControls({
 
         <Button
           onClick={onSolve}
-          variant="default"
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-md hover:shadow-lg transition-all"
+          variant="default" 
+          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600 shadow-md hover:shadow-lg transition-all text-white dark:text-primary-foreground"
           disabled={solving || gameComplete || disabled}
         >
           {solving ? (
@@ -82,13 +82,13 @@ export function GameControls({
 
       {hasSolution && (
         <div className="space-y-2 max-w-md mx-auto">
-          <div className="flex justify-between text-sm text-gray-500">
+          <div className="flex justify-between text-sm text-muted-foreground">
             <span>Solution Progress</span>
             <span>
               {solutionProgress} / {solutionLength}
             </span>
           </div>
-          <Progress value={progressPercentage} className="h-3 bg-gray-100" />
+          <Progress value={progressPercentage} className="h-3 bg-muted" />
         </div>
       )}
 
@@ -96,7 +96,7 @@ export function GameControls({
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-md shadow-inner"
+          className="flex items-center justify-center gap-2 p-4 bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 dark:from-green-900/30 dark:to-emerald-900/30 dark:text-green-300 rounded-md shadow-inner"
         >
           <Check className="h-5 w-5" />
           <span className="font-medium">Puzzle Completed! 🎉</span>
@@ -105,3 +105,4 @@ export function GameControls({
     </motion.div>
   )
 }
+

@@ -1,21 +1,31 @@
 export interface GameState {
-  bottles: number[][]
+  bottles: number[][];
 }
 
 export interface Movement {
-  from: number
-  to: number
-  amount: number
+  from: number;
+  to: number;
+  amount: number;
 }
 
-export interface AnimationState {
-  fromX: number
-  fromY: number
-  toX: number
-  toY: number
-  color: number
-  amount: number
-  fromIndex: number
-  toIndex: number
-  onComplete: () => void
+export type PourAnimationStage =
+  | 'idle'
+  | 'calculatingMove'
+  | 'movingToTarget'
+  | 'tiltingAtTarget'
+  | 'streaming'
+  | 'returningTiltAtTarget'
+  | 'movingBack';
+
+export interface PourAnimation {
+  fromIndex: number;
+  toIndex: number;
+  color: number;
+  amount: number;
+  stage: PourAnimationStage;
+  sourceOriginalX?: number;
+  sourceOriginalY?: number;
+  pourPositionX?: number; 
+  pourPositionY?: number;
 }
+

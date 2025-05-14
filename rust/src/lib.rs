@@ -5,7 +5,7 @@ use std::hash::{Hash, Hasher};
 use wasm_bindgen::prelude::*;
 
 const MAX_LEVELS: usize = 12;
-const MAX_N_OF_BOTTLES: usize = 10;
+const MAX_N_OF_BOTTLES: usize = 12;
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
 struct Bottle {
