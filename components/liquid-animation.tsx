@@ -46,23 +46,23 @@ export function LiquidAnimation({
 
   const bottleVisualHeight = sourceRect.height;
   const bottleVisualWidth = sourceRect.width;
-  const theta = (tiltAngleDegrees * Math.PI) / 180;
 
   let sx = sourceRect.right - svgOriginRect.left - bottleVisualWidth * 0.15;
-  let sy = sourceRect.top - svgOriginRect.top + bottleVisualHeight * 0.1; 
+  let sy = sourceRect.top - svgOriginRect.top + bottleVisualHeight * 0.1;
 
   if (tiltAngleDegrees > 0) {
     sx = sourceRect.left - svgOriginRect.left + bottleVisualWidth * 0.15;
     sy = sourceRect.top - svgOriginRect.top + bottleVisualHeight * 0.1;
   }
 
-
   const ex = targetRect.left - svgOriginRect.left + targetRect.width / 2;
-  const ey = targetRect.top - svgOriginRect.top + 5;
+  const ey = targetRect.top - svgOriginRect.top + 5; 
 
   const controlX = (sx + ex) / 2;
-  const controlY = Math.min(sy, ey) - 60 - Math.abs(sx - ex) * 0.15;
-
+  
+  const curveHeightFactor = bottleVisualHeight * 0.25; 
+  const controlY =
+    Math.min(sy, ey) - curveHeightFactor - Math.abs(sx - ex) * 0.15;
 
   const pathD = `M ${sx} ${sy} Q ${controlX} ${controlY} ${ex} ${ey}`;
 
@@ -72,7 +72,7 @@ export function LiquidAnimation({
         <motion.path
           d={pathD}
           stroke={colorMap[color] || "grey"}
-          strokeWidth="10"
+          strokeWidth="10" 
           fill="transparent"
           strokeLinecap="round"
           initial={{ pathLength: 0, opacity: 0.7 }}

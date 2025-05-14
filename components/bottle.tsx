@@ -10,7 +10,7 @@ interface BottleProps {
   selected: boolean;
   onClick: () => void;
   bottleIndex: number;
-  height: number;
+  height: number; 
   pourAnimationInfo?: PourAnimation;
   onAnimationEvent?: (
     event:
@@ -24,7 +24,7 @@ interface BottleProps {
 }
 
 const colorMap: Record<number, string> = {
-  0: "bg-transparent", 
+  0: "bg-transparent",
   1: "bg-red-500",
   2: "bg-green-500",
   3: "bg-blue-500",
@@ -39,7 +39,6 @@ const colorMap: Record<number, string> = {
   12: "bg-cyan-500",
 };
 const emptySegmentDarkColor = "dark:bg-neutral-700/30";
-
 
 export const Bottle = forwardRef<HTMLDivElement, BottleProps>(
   (
@@ -63,7 +62,7 @@ export const Bottle = forwardRef<HTMLDivElement, BottleProps>(
         controls.start({
           opacity: 1,
           x: 0,
-          y: 0, 
+          y: 0,
           rotate: 0,
           zIndex: selected ? 10 : 0,
           transition: { duration: 0.3, delay: bottleIndex * 0.05 },
@@ -72,12 +71,8 @@ export const Bottle = forwardRef<HTMLDivElement, BottleProps>(
       }
 
       if (pourAnimationInfo) {
-        const {
-          stage,
-          pourPositionX, 
-          pourPositionY, 
-          sourceOriginalX, 
-        } = pourAnimationInfo;
+        const { stage, pourPositionX, pourPositionY, sourceOriginalX } =
+          pourAnimationInfo;
 
         const deltaX =
           pourPositionX !== undefined && sourceOriginalX !== undefined
@@ -90,7 +85,7 @@ export const Bottle = forwardRef<HTMLDivElement, BottleProps>(
             controls
               .start({
                 x: deltaX,
-                y: transformY, 
+                y: transformY,
                 rotate: 0,
                 opacity: 1,
                 zIndex: 20,
@@ -127,8 +122,8 @@ export const Bottle = forwardRef<HTMLDivElement, BottleProps>(
           case "movingBack":
             controls
               .start({
-                x: 0, 
-                y: 0, 
+                x: 0,
+                y: 0,
                 rotate: 0,
                 opacity: 1,
                 zIndex: selected ? 10 : 0,
@@ -171,14 +166,21 @@ export const Bottle = forwardRef<HTMLDivElement, BottleProps>(
         whileHover={!isPouringSource ? { scale: 1.05 } : {}}
         whileTap={!isPouringSource ? { scale: 0.95 } : {}}
         className={cn(
-          "relative w-16 h-64 flex flex-col cursor-pointer",
+          "relative flex flex-col cursor-pointer",
+          "w-12 h-48 sm:w-14 sm:h-56 md:w-16 md:h-64", 
           "rounded-b-xl overflow-hidden group",
         )}
         onClick={onClick}
       >
         <div className="absolute inset-0 rounded-b-xl bg-gradient-to-r from-white/20 to-white/5 dark:from-neutral-700/20 dark:to-neutral-800/10 backdrop-blur-sm border-2 border-gray-300/50 dark:border-neutral-700/50 shadow-lg pointer-events-none" />
 
-        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-10 h-6 bg-gradient-to-r from-white/40 to-white/10 dark:from-neutral-600/40 dark:to-neutral-700/20 rounded-t-lg border-2 border-gray-300/50 dark:border-neutral-700/50" />
+        <div
+          className={cn(
+            "absolute -top-4 left-1/2 transform -translate-x-1/2",
+            "w-8 h-5 sm:w-9 sm:h-[1.375rem] md:w-10 md:h-6", 
+            "bg-gradient-to-r from-white/40 to-white/10 dark:from-neutral-600/40 dark:to-neutral-700/20 rounded-t-lg border-2 border-gray-300/50 dark:border-neutral-700/50",
+          )}
+        />
 
         <div
           className={cn(

@@ -118,7 +118,7 @@ export default function Home() {
         const targetBottleTop_relativeToGameArea =
           targetRect.top - gameAreaRect.top;
         const desiredSourceBottomY_relativeToGameArea =
-          targetBottleTop_relativeToGameArea - 20;
+          targetBottleTop_relativeToGameArea - 20; 
 
         const desiredSourceTopY_relativeToGameArea =
           desiredSourceBottomY_relativeToGameArea - bottleVisualHeight;
@@ -482,10 +482,10 @@ export default function Home() {
         )}
         <Tabs value={activeTab} className="w-full">
           <TabsContent value="game" className="mt-0">
-            <Card className="w-full p-6 shadow-xl rounded-xl border-0 overflow-hidden backdrop-blur-sm bg-card/90 dark:bg-card/80">
+            <Card className="w-full p-6 shadow-xl rounded-xl border-0 backdrop-blur-sm bg-card/90 dark:bg-card/80">
               <div
                 ref={gameAreaRef}
-                className="flex flex-wrap justify-center items-end gap-4 mb-6 relative min-h-[28rem]"
+                className="flex flex-wrap justify-center items-end gap-2 md:gap-4 mb-6 relative min-h-[20rem] sm:min-h-[24rem] md:min-h-[28rem]"
               >
                 {gameState.bottles.map((bottleColors, index) => (
                   <Bottle
@@ -562,7 +562,14 @@ export default function Home() {
           </p>
         </div>
       </footer>
-      <Toaster />
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          classNames: {
+            description: "text-sm break-words",
+          },
+        }}
+      />
     </main>
   );
 }
