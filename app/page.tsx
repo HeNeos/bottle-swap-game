@@ -197,12 +197,28 @@ export default function Home() {
   const handleBottleClick = (bottleIndex: number) => {
     if (solving || currentPour) return;
 
+    if (solution.length > 0) {
+      const isInitiatingManualMove =
+        (selectedBottle === null &&
+          gameState.bottles[bottleIndex].some((c) => c !== 0)) || 
+        (selectedBottle !== null && selectedBottle !== bottleIndex);
+
+      if (isInitiatingManualMove) {
+        setSolution([]);
+        setSolutionIndex(0);
+        // toast({
+        //   title: "Solver Reset",
+        //   description: "Manual move has cleared the current solution.",
+        // });
+      }
+    }
+
     if (selectedBottle === null) {
       if (gameState.bottles[bottleIndex].some((c) => c !== 0)) {
         setSelectedBottle(bottleIndex);
       }
     } else if (selectedBottle === bottleIndex) {
-      setSelectedBottle(null);
+      setSelectedBottle(null); 
     } else {
       const fromBottleArray = gameState.bottles[selectedBottle];
       const toBottleArray = gameState.bottles[bottleIndex];
@@ -227,7 +243,7 @@ export default function Home() {
           description: "Cannot pour from this bottle to the selected bottle.",
           variant: "destructive",
         });
-        setSelectedBottle(null);
+        setSelectedBottle(null); 
       }
     }
   };
@@ -318,10 +334,10 @@ export default function Home() {
 
   const resetGame = () => {
     resetGameLogic();
-    toast({
-      title: "Game Reset",
-      description: "A new random puzzle has been generated.",
-    });
+    // toast({
+    //   title: "Game Reset",
+    //   description: "A new random puzzle has been generated.",
+    // });
   };
 
   const handleSolve = async () => {
@@ -432,10 +448,10 @@ export default function Home() {
     setNumColors(colors);
     setBottleHeight(height);
     setActiveTab("game");
-    toast({
-      title: "Settings Applied",
-      description: `Game configured: ${bottles} bottles, ${colors} colors, ${height} levels.`,
-    });
+    // toast({
+    //   title: "Settings Applied",
+    //   description: `Game configured: ${bottles} bottles, ${colors} colors, ${height} levels.`,
+    // });
   };
 
   const celebrateWin = () => {
