@@ -313,11 +313,8 @@ const moveLiquid = (
     return state.bottles.every((bottle) => {
       const filledLevels = bottle.filter(c => c !== 0);
       if (filledLevels.length === 0) return true;
-      if (filledLevels.length === bottleHeight) {
-        const firstColor = filledLevels[0];
-        return filledLevels.every(color => color === firstColor);
-      }
-      return false;
+      const firstColor = filledLevels[0];
+      return filledLevels.every(color => color === firstColor);
     });
   };
 
